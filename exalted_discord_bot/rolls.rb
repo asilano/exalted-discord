@@ -19,7 +19,7 @@ module ExaltedDiscordBot
       parsed_opts = parse_options(options.reprocess)
       r = Mechanics::Roll.new(count, parsed_opts[:roll])
       event.channel.send_embed do |e|
-        e.title = "#{event.user.nick} rolled #{parsed_opts[:display][:msg] || count.to_s + 'dice'}"
+        e.title = "#{response['char_name']} rolled #{parsed_opts[:display][:msg] || count.to_s + 'dice'}"
         e.description = r.output
         e.color = COLOURS[:roll]
       end
@@ -35,6 +35,7 @@ module ExaltedDiscordBot
                                 "+num                  # Additional dice to roll above the base pool\n" \
                                 "-msg <message>        # Flavour text to report with the roll\n" \
                                 "-auto <num>           # Grant <num> automatic successes\n" \
+                                "-nopenalty            # Ignore dice penalties due to Health Levels\n" \
                                 "-dbl <7,8,9>          # Double the given number (and above)\n" \
                                 "-flat10               # Rolls of 10 don't count double\n" \
                                 "-botch1               # Rolls of 1 subtract a success\n" \
@@ -50,15 +51,30 @@ module ExaltedDiscordBot
       if response.key?('error')
         event.channel.send_message("There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```")
       else
-        message = response['parsed_pool']
-        message << " + #{int_parts.join('+')}" unless int_parts.empty?
-        count = non_int_parts.map { |part| response[part].to_i }.sum + int_parts.map(&:to_i).sum
-        r = Mechanics::Roll.new(count, parsed_opts[:roll])
+        incap = response['penalty'] == 'incap'
 
-        event.channel.send_embed do |e|
-          e.title = "#{event.user.nick} rolled #{parsed_opts[:display][:msg] || message}"
-          e.description = r.output
-          e.color = COLOURS[:roll]
+        message = response['parsed_pool']
+        message << ', wounded' if (incap || response['penalty'].negative?) && !parsed_opts[:roll][:nopenalty]
+        message << " + #{int_parts.join('+')}" unless int_parts.empty?
+
+        count = non_int_parts.map { |part| response[part].to_i }.sum + int_parts.map(&:to_i).sum
+        count += response['penalty'].to_i unless parsed_opts[:roll][:nopenalty]
+        if incap || count <= 0
+          description = incap ? 'Incapacitated' : 'Excessively wounded'
+
+          event.channel.send_embed do |e|
+            e.title = "#{response['char_name']} couldn't roll #{parsed_opts[:display][:msg] || message}"
+            e.description = description
+            e.color = COLOURS[:roll]
+          end
+        else
+          r = Mechanics::Roll.new(count, parsed_opts[:roll])
+
+          event.channel.send_embed do |e|
+            e.title = "#{response['char_name']} rolled #{parsed_opts[:display][:msg] || message}"
+            e.description = r.output
+            e.color = COLOURS[:roll]
+          end
         end
       end
     end
@@ -73,6 +89,8 @@ module ExaltedDiscordBot
           case token.downcase
           when '-msg'
             state = :msg
+          when '-nopenalty'
+            parsed[:roll][:nopenalty] = true
           when '-auto'
             state = :auto
           when '-dbl'

@@ -5,7 +5,8 @@ module Helpers
       COLOURS = {
         info: 0x569cd6,
         meta: 0x6a9955,
-        roll: 0xd7ba7d
+        roll: 0xd7ba7d,
+        pay:  0xd16969
       }
 
       ABILITIES = %w[

@@ -18,6 +18,14 @@ class SheetsApiService
     JSON.parse(get("characters/discord/#{for_user_uid}/server/#{server_uid}/pools", 'pools[]': pools))
   end
 
+  def self.pay_resource(amount, resource, for_user_uid:, server_uid:)
+    JSON.parse(post("characters/discord/#{for_user_uid}/server/#{server_uid}/pay", amount: amount, resource: resource))
+  end
+
+  def self.gain_resource(amount, resource, for_user_uid:, server_uid:)
+    JSON.parse(post("characters/discord/#{for_user_uid}/server/#{server_uid}/gain", amount: amount, resource: resource))
+  end
+
   ##
   # Internals
   def self.get(endpoint, data = nil)
