@@ -1,5 +1,5 @@
-
 require './helpers/bot_helpers'
+require './lib/db_connection'
 require './sheets_api_service'
 require './exalted_discord_bot/management'
 require './exalted_discord_bot/rolls'

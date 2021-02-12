@@ -1,5 +1,6 @@
 require 'byebug'
 require 'discordrb'
+require './lib/db_connection'
 require 'active_support/core_ext/string'
 require './exalted_discord_bot/bot'
 
