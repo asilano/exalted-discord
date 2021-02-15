@@ -49,7 +49,7 @@ module ExaltedDiscordBot
       response = SheetsApiService.get_pools(non_int_parts, for_user_uid: event.user.id, server_uid: event.server.id)
 
       if response.key?('error')
-        event.channel.send_message("There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```")
+        event << "There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```"
       else
         incap = response['penalty'] == 'incap'
 

@@ -12,7 +12,7 @@ module ExaltedDiscordBot
       wait_in_channel(event.channel) do
         response = SheetsApiService.character_list(for_user_uid: event.user.id)
         if response.key?('error')
-          event.channel.send_message("There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```")
+          event << "There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```"
         else
           event.channel.send_embed do |e|
             e.title = "#{event.user.nick}'s characters"
@@ -30,7 +30,7 @@ module ExaltedDiscordBot
       wait_in_channel(event.channel) do
         response = SheetsApiService.use_character(for_user_uid: event.user.id, name: name_parts.join(' '), server_uid: event.server.id)
         if response.key?('error')
-          event.channel.send_message("There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```")
+          event << "There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```"
         else
           event.channel.send_embed do |e|
             e.title = "#{response['name']} activated"
@@ -46,7 +46,7 @@ module ExaltedDiscordBot
       wait_in_channel(event.channel) do
         response = SheetsApiService.unuse_character(for_user_uid: event.user.id, server_uid: event.server.id)
         if response.key?('error')
-          event.channel.send_message("There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```")
+          event << "There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```"
         else
           event.channel.send_embed do |e|
             e.title = "Character deactivated"

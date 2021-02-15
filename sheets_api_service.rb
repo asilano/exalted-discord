@@ -53,8 +53,12 @@ class SheetsApiService
     request.set_form_data(data) if data
     set_headers(request)
 
-    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: use_ssl?) do |http|
-      http.request(request)
+    begin
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: use_ssl?) do |http|
+        http.request(request)
+      end
+    rescue
+      return '{ "errorCode": 500, "error": "Exception connecting to sheets server" }'
     end
     return "{ \"errorCode\": #{response.code}, \"error\": \"#{JSON.parse(response.body)['error']}\" }" unless response.is_a?(Net::HTTPSuccess)
 

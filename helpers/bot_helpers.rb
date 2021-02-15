@@ -3,11 +3,12 @@ module Helpers
   module BotHelpers
     module Constants
       COLOURS = {
-        info: 0x569cd6,
-        meta: 0x6a9955,
-        roll: 0xd7ba7d,
-        pay:  0xd16969
-      }
+        info:   0x569cd6,
+        meta:   0x6a9955,
+        roll:   0xd7ba7d,
+        pay:    0xd16969,
+        combat: 0xc60f0f
+      }.freeze
 
       ABILITIES = %w[
         archery
@@ -36,7 +37,7 @@ module Helpers
         survival
         thrown
         war
-      ]
+      ].freeze
     end
 
     include Constants

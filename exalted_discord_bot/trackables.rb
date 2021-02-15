@@ -23,7 +23,7 @@ module ExaltedDiscordBot
       wait_in_channel(event.channel) do
         response = SheetsApiService.pay_resource(amount, resource, for_user_uid: event.user.id, server_uid: event.server.id)
         if response.key?('error')
-          event.channel.send_message("There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```")
+          event << "There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```"
         else
           event.channel.send_embed do |e|
             e.title = "#{response['char_name']} paid #{amount} #{TRACKABLE_FULL_NAMES[resource]}"
@@ -39,7 +39,7 @@ module ExaltedDiscordBot
       wait_in_channel(event.channel) do
         response = SheetsApiService.gain_resource(amount, resource, for_user_uid: event.user.id, server_uid: event.server.id)
         if response.key?('error')
-          event.channel.send_message("There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```")
+          event << "There was a problem:\n```#{response['errorCode']} - #{response['error']}\n```"
         else
           event.channel.send_embed do |e|
             e.title = "#{response['char_name']} gained #{amount} #{TRACKABLE_FULL_NAMES[resource]}"
