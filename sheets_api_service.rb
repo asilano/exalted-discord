@@ -14,6 +14,10 @@ class SheetsApiService
     JSON.parse(delete("users/discord/#{for_user_uid}/unuse_character", server_uid: server_uid))
   end
 
+  def self.character_status(for_user_uid:, server_uid:)
+    JSON.parse(get("characters/discord/#{for_user_uid}/server/#{server_uid}/"))
+  end
+
   def self.get_pools(pools, for_user_uid:, server_uid:)
     JSON.parse(get("characters/discord/#{for_user_uid}/server/#{server_uid}/pools", 'pools[]': pools))
   end
