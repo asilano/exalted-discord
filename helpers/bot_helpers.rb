@@ -1,4 +1,6 @@
 require 'shellwords'
+require_relative './roll_helpers'
+
 module Helpers
   module BotHelpers
     module Constants
@@ -41,6 +43,7 @@ module Helpers
     end
 
     include Constants
+    include RollHelpers
 
     def wait_in_channel(channel)
       wait_msg = channel.send_message('One moment...')
@@ -76,6 +79,13 @@ module Helpers
           embed.add_field name: "\u200B", value: col, inline: true
         end
       end
+
+      health_numbers = response['health_levels'].map { |hl| "%2s" % [hl['penalty']] }
+      damage_sym = { 'o' => '  ', 'b' => ' B', 'l' => ' L', 'a' => ' A' }
+      damage = response['health_levels'].map { |hl| damage_sym[hl['damaged'][0]] }
+      embed.add_field name: "\u200B", value: ("Health levels\n```\n" +
+                                                health_numbers.join(' ') + "\n" +
+                                                damage.join(' ') + "\n```")
     end
 
     module Patches

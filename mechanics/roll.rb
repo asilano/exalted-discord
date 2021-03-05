@@ -1,23 +1,55 @@
 module Mechanics
   class Roll
-    def initialize(count, options)
-      @count = count
+    attr_reader :name, :incap
+
+    def initialize(int_parts, non_int_parts, options, response)
+      @int_parts = int_parts
+      @non_int_parts = non_int_parts
       @options = options
+      @response = response
+      @name = response['char_name']
+    end
+
+    def roll_it
+      if @response['penalty'] == 'incap'
+        @incap = true
+        return
+      end
+
+      perform
+      self
+    end
+
+    def message(simple: false)
+      return @options[:msg] if @options[:msg].present?
+      return "#{@count} dice" if simple
+
+      message = @response['parsed_pool']
+      message << ", wounded #{@response['penalty']}" if @response['penalty'].negative? && !@options[:nopenalty]
+      message << " + #{@int_parts.join('+')}" unless @int_parts.empty?
+      message
     end
 
     def output
-      roll_it
       "#{@success} successes (#{"with #{@options[:auto]} automatic " if @options[:auto]&.positive?}on #{@count} dice: [#{@rolls.map { |d| format(d) }.join(', ')}])"
     end
 
     private
 
-    def roll_it
-      @rolls = Array.new(@count.to_i) { Die.new(@options) }.sort.reverse
+    def perform
+      @count = count
+      @rolls = Array.new(@count) { Die.new(@options) }.sort.reverse
       @success = @rolls.count { |d| d.type == :single }
       @success += 2 * @rolls.count { |d| d.type == :double }
       @success -= @rolls.count { |d| d.type == :botch }
       @success += @options[:auto] if @options[:auto]
+    end
+
+    def count
+      [@non_int_parts.map { |part| @response[part].to_i }.sum +
+        @int_parts.map(&:to_i).sum +
+        (@response['penalty'].to_i unless @options[:nopenalty]),
+       0].max
     end
 
     def format(die)
