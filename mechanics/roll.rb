@@ -1,6 +1,6 @@
 module Mechanics
   class Roll
-    attr_reader :name, :incap
+    attr_reader :name, :incap, :success
 
     def initialize(int_parts, non_int_parts, options, response)
       @int_parts = int_parts
